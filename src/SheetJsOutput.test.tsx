@@ -110,14 +110,26 @@ describe('SheetJsOutput', () => {
         <row>
           <date>2021-01-01</date>
           <date>2022-01-02</date>
+          <date>1900-03-01</date>
+          <date>1900-02-28</date>
+        </row>
+        <row>
+          <date>2022-01-02T15:00:00Z</date>
+          <date>1900-03-01T16:00:00Z</date>
+          <date>1900-02-28T11:00:00Z</date>
         </row>
       </SheetJsOutput>
     );
 
     expect(await ref.current!.getExcelSheet()).toEqual({
-      '!ref': 'A1:B1',
+      '!ref': 'A1:D2',
       A1: { v: 44197, t: 'n', z: 'YYYY-MM-DD' },
       B1: { v: 44563, t: 'n', z: 'YYYY-MM-DD' },
+      C1: { v: 60, t: 'n', z: 'YYYY-MM-DD' },
+      D1: { v: 59, t: 'n', z: 'YYYY-MM-DD' },
+      A2: { v: 44563.625, t: 'n', z: 'YYYY-MM-DD' },
+      B2: { v: 61.666666666666664, t: 'n', z: 'YYYY-MM-DD' },
+      C2: { v: 59.458333333333336, t: 'n', z: 'YYYY-MM-DD' },
     });
   });
 
