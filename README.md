@@ -52,23 +52,12 @@ const MyComponent: React.FC = () => {
           <boolean>false</boolean>
         </row>
       </SheetJsOutput>
-      
-      <button onClick={handleGetExcelSheet}>
-        Generate Excel Sheet Data
-      </button>
+
+      <button onClick={handleGetExcelSheet}>Generate Excel Sheet Data</button>
     </div>
   );
 };
 ```
-
-### Performance Benefits
-
-The component uses **lazy generation** - the Excel sheet data is only converted from the JSX structure when you explicitly call `getExcelSheet()` on the ref. This means:
-
-- No unnecessary conversions on every render
-- Better performance for large datasets
-- You control when the conversion happens
-- Perfect for on-demand export scenarios
 
 ### Cell Types
 
@@ -104,25 +93,7 @@ const excelSheet = sheetRef.current.getExcelSheet();
 
 **Important**: The Excel sheet is only generated when this function is called. Before calling it, the function will return `null`.
 
-The returned object has the following structure:
-
-```tsx
-interface ExcelSheet {
-  rows: ExcelRow[];
-}
-
-interface ExcelRow {
-  cells: ExcelCell[];
-  widthSetting?: boolean;
-}
-
-interface ExcelCell {
-  type: 'text' | 'number' | 'boolean' | 'date' | 'formula';
-  value: string | number | boolean | Date;
-  width?: number;
-  format?: string;
-}
-```
+The returned object is a [SheetJS Sheet Object](https://docs.sheetjs.com/docs/csf/sheet).
 
 ## Installation
 
@@ -143,6 +114,7 @@ The component includes full TypeScript support with proper type definitions for 
 The main component that renders Excel data.
 
 **Props:**
+
 - `render?: (worksheet: WorkSheet) => React.ReactNode` - Function to render UI with the generated worksheet
 - `children` - Excel structure using the cell components
 
@@ -151,47 +123,58 @@ The main component that renders Excel data.
 Represents an Excel row.
 
 **Props:**
+
 - `widthSetting?: boolean` - If true, this row's cell widths will be used to set column widths
 - `children` - Cell components
 
 ### Cell Components
 
 #### `<text>`
+
 Renders a text cell.
 
 **Props:**
+
 - `width?: number` - Column width
 - `z?: string` - Format string
 - `children` - Cell content
 
 #### `<number>`
+
 Renders a numeric cell.
 
 **Props:**
+
 - `width?: number` - Column width
 - `z?: string` - Format string (e.g., "#,##0.00")
 - `children` - Cell content
 
 #### `<date>`
+
 Renders a date cell.
 
 **Props:**
+
 - `width?: number` - Column width
 - `z?: string` - Date format (e.g., "MMM DD", "YYYY-MM-DD")
 - `children` - Date value
 
 #### `<boolean>`
+
 Renders a boolean cell.
 
 **Props:**
+
 - `width?: number` - Column width
 - `z?: string` - Format string
 - `children` - Boolean value
 
 #### `<formula>`
+
 Renders a formula cell.
 
 **Props:**
+
 - `width?: number` - Column width
 - `z?: string` - Format string
 - `children` - Excel formula
@@ -203,6 +186,7 @@ Renders a formula cell.
 Downloads the generated worksheet as an Excel file.
 
 **Parameters:**
+
 - `worksheet` - The worksheet object from SheetJsOutput
 - `filename` - Optional filename (default: 'export.xlsx')
 
@@ -212,9 +196,9 @@ Downloads the generated worksheet as an Excel file.
 
 ```jsx
 <SheetJsOutput
-  render={(worksheet) => (
+  render={worksheet => (
     <div>
-      <button 
+      <button
         onClick={() => downloadExcel(worksheet, 'styled-export.xlsx')}
         style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white' }}
       >
@@ -230,26 +214,18 @@ Downloads the generated worksheet as an Excel file.
 ### With Conditional Rendering
 
 ```jsx
-<SheetJsOutput
-  render={(worksheet) => (
-    <button onClick={() => downloadExcel(worksheet)}>
-      Export Data
-    </button>
-  )}
->
+<SheetJsOutput render={worksheet => <button onClick={() => downloadExcel(worksheet)}>Export Data</button>}>
   <row>
     <text>Name</text>
     <text>Status</text>
     <text>Value</text>
   </row>
-  
+
   {data.map((item, index) => (
     <row key={index}>
       <text>{item.name}</text>
       <text>{item.status}</text>
-      <number z="#,##0.00">
-        {item.status === 'active' ? item.value : 0}
-      </number>
+      <number z="#,##0.00">{item.status === 'active' ? item.value : 0}</number>
     </row>
   ))}
 </SheetJsOutput>
@@ -263,4 +239,4 @@ The key components (`row`, `text`, `number`, etc.) are not actual DOM elements b
 
 ## License
 
-MIT 
+MIT
