@@ -1,45 +1,69 @@
-import { Reconciler } from 'react-reconciler';
-import { ExcelCell, ExcelRow, ExcelSheet, CustomElement } from './types';
+import Reconciler, { DefaultEventPriority } from 'react-reconciler';
+import { ExcelCell, ExcelRow, ExcelSheet, CustomElement, TextNode, CustomNode } from './types';
 
 // Custom host config for Excel rendering
 const hostConfig = {
   // Create a new instance
-  createInstance(type: string, props: any, rootContainerInstance: ExcelSheet) {
-    return { type, props, children: [] };
+  createInstance(type: string, props: any, rootContainerInstance: ExcelSheet): CustomElement {
+    console.log('createInstance', type, props, rootContainerInstance);
+    return { type, props, children: [], nodeType: 'element' };
   },
 
   // Create a new text instance
-  createTextInstance(text: string, rootContainerInstance: ExcelSheet) {
-    return { type: 'text', value: text };
+  createTextInstance(text: string, rootContainerInstance: ExcelSheet): TextNode {
+    console.log('createTextInstance', text, rootContainerInstance);
+    return { value: text, nodeType: 'text' };
   },
 
-  // Append a child to a parent
-  appendChild(parentInstance: any, child: any) {
-    if (parentInstance.children) {
-      parentInstance.children.push(child);
-    }
+  // // Append a child to a parent
+  // appendChild(parentInstance: CustomElement, child: CustomNode) {
+  //   console.log('appendChild', parentInstance, child)
+  //   if (parentInstance.children) {
+  //     parentInstance.children.push(child);
+  //   }
+  // },
+
+  appendInitialChild(parentInstance: CustomElement, child: CustomNode) {
+    console.log('appendInitialChild', parentInstance, child);
+    parentInstance.children?.push(child);
   },
 
-  // Append a child to a parent before a specific child
-  insertBefore(parentInstance: any, child: any, beforeChild: any) {
-    if (parentInstance.children) {
-      const index = parentInstance.children.indexOf(beforeChild);
-      if (index !== -1) {
-        parentInstance.children.splice(index, 0, child);
-      } else {
-        parentInstance.children.push(child);
-      }
-    }
+  finalizeInitialChildren(instance: CustomNode, type: string, props: any) {
+    console.log('finalizeInitialChildren', instance, type, props);
+    return false;
   },
 
-  // Remove a child from a parent
-  removeChild(parentInstance: any, child: any) {
-    if (parentInstance.children) {
-      const index = parentInstance.children.indexOf(child);
-      if (index !== -1) {
-        parentInstance.children.splice(index, 1);
-      }
-    }
+  shouldSetTextContent(instance: CustomNode, type: string, props: any) {
+    console.log('shouldSetTextContent', instance, type, props);
+    return false;
+  },
+
+  // // Append a child to a parent before a specific child
+  // insertBefore(parentInstance: CustomElement, child: CustomNode, beforeChild: CustomNode) {
+  //   console.log('insertBefore', parentInstance, child, beforeChild)
+  //   if (parentInstance.children) {
+  //     const index = parentInstance.children.indexOf(beforeChild);
+  //     if (index !== -1) {
+  //       parentInstance.children.splice(index, 0, child);
+  //     } else {
+  //       parentInstance.children.push(child);
+  //     }
+  //   }
+  // },
+
+  // // Remove a child from a parent
+  // removeChild(parentInstance: CustomElement, child: CustomNode) {
+  //   console.log('removeChild', parentInstance, child)
+  //   if (parentInstance.children) {
+  //     const index = parentInstance.children.indexOf(child);
+  //     if (index !== -1) {
+  //       parentInstance.children.splice(index, 1);
+  //     }
+  //   }
+  // },
+
+  preparePortalMount(parentInstance: CustomElement, child: CustomNode) {
+    console.log('preparePortalMount', parentInstance, child);
   },
 
   // Get the root container instance
@@ -63,7 +87,7 @@ const hostConfig = {
   },
 
   // Get the public instance
-  getPublicInstance(instance: any) {
+  getPublicInstance(instance: CustomNode) {
     return instance;
   },
 
@@ -88,19 +112,9 @@ const hostConfig = {
     // No special mount logic needed
   },
 
-  // Should set text content
-  shouldSetTextContent(type: string, props: any) {
-    return false;
-  },
-
   // Reset text content
   resetTextContent(instance: any) {
     // No reset needed
-  },
-
-  // Get the current event priority
-  getCurrentEventPriority() {
-    return 0;
   },
 
   // Get the instance from node
@@ -111,16 +125,6 @@ const hostConfig = {
   // Get the node from instance
   getNodeFromInstance(instance: any) {
     return instance;
-  },
-
-  // Before active instance blur
-  beforeActiveInstanceBlur() {
-    // No blur handling needed
-  },
-
-  // After active instance blur
-  afterActiveInstanceBlur() {
-    // No blur handling needed
   },
 
   // Is primary renderer
@@ -147,97 +151,134 @@ const hostConfig = {
     return Date.now();
   },
 
+  supportsMicrotasks: true,
+
+  scheduleMicrotask(fn: (...args: any[]) => void) {
+    queueMicrotask(fn);
+  },
+
   // Supports mutation
-  supportsMutation: true,
+  supportsMutation: false,
 
   // Supports persistence
-  supportsPersistence: false,
+  supportsPersistence: true,
+
+  getCurrentEventPriority() {
+    return DefaultEventPriority;
+  },
+
+  // Undocumented methods as of June 21, 2025
+  createContainerChildSet(container: CustomElement) {
+    console.log('createContainerChildSet', arguments);
+    return container;
+  },
+
+  replaceContainerChildren(c1: CustomElement, c2: CustomElement) {
+    console.log('replaceContainerChildren', arguments);
+    return c2;
+  },
+
+  appendChildToContainerChildSet(container: CustomElement, child: CustomNode) {
+    console.log('appendChildToContainerChildSet', arguments);
+    container.children?.push(child);
+  },
+
+  finalizeContainerChildren(container: CustomElement) {
+    return false;
+  },
 };
 
 // Create the reconciler
 export const excelReconciler = Reconciler(hostConfig);
 
+
+function processCell(element: CustomElement): ExcelCell | null {
+  return {
+    ...processCellContents(element),
+    width: element.props.width,
+    z: element.props.z,
+  }
+}
+
+function processCellContents(element: CustomElement): ExcelCell  {
+  const textContent = element.children?.filter(child => child.nodeType === 'text')?.map(child => child.value).join('')
+
+  if (element.nodeType === 'element' && element.type === 'text') {
+    return {
+      t: 's',
+      v: textContent,
+    }
+  } else if (element.nodeType === 'element' && element.type === 'number') {
+    return {
+      t: 'n',
+      v: Number(textContent),
+    }
+  } else if (element.nodeType === 'element' && element.type === 'boolean') {
+    return {
+      t: 'b',
+      v: textContent === 'true' || textContent === '1',
+    }
+  } else if (element.nodeType === 'element' && element.type === 'date') {
+    return {
+      t: 'd',
+      // TODO convert from epoch to UTC
+      v: new Date(textContent).getTime(),
+    }
+  } else if (element.nodeType === 'element' && element.type === 'formula') {
+    return {
+      f: textContent,
+    }
+  } else {
+    throw new Error('Unsupported cell type')
+  }
+}
+
+function processTopLevelElements(element: CustomElement): ExcelRow | null {
+  if (element.type === 'row') {
+    const row: ExcelRow = {
+      cells: [],
+      widthSetting: element.props.widthSetting || false,
+    };
+
+    if (element.children) {
+      for (const child of element.children) {
+        if (child.nodeType === 'text') {
+          if (child.value.trim()) {
+            throw new Error('Non-empty text node found in row')
+          }
+          continue
+        }
+
+        const cell = processCell(child);
+        if (cell) {
+          row.cells.push(cell);
+        }
+      }
+    }
+
+    return row;
+  }
+
+  return null;
+}
 // Helper function to convert custom elements to Excel sheet
 export function convertToExcelSheet(rootElement: CustomElement): ExcelSheet {
   const sheet: ExcelSheet = { rows: [] };
-  
-  function processElement(element: CustomElement): ExcelRow | null {
-    if (element.type === 'row') {
-      const row: ExcelRow = {
-        cells: [],
-        widthSetting: element.props.widthSetting || false
-      };
-      
-      if (element.children) {
-        for (const child of element.children) {
-          const cell = processCell(child);
-          if (cell) {
-            row.cells.push(cell);
-          }
-        }
-      }
-      
-      return row;
-    }
-    
-    return null;
-  }
-  
-  function processCell(element: CustomElement): ExcelCell | null {
-    const cellTypes = ['text', 'number', 'boolean', 'date', 'formula'];
-    
-    if (cellTypes.indexOf(element.type) !== -1) {
-      let value: string | number | boolean | Date = '';
-      
-      // Extract value from children
-      if (element.children && element.children.length > 0) {
-        const child = element.children[0];
-        if (child.type === 'text' && 'value' in child) {
-          value = (child as any).value;
-        }
-      }
-      
-      // Convert value based on type
-      switch (element.type) {
-        case 'number':
-          value = Number(value);
-          break;
-        case 'boolean':
-          value = Boolean(value);
-          break;
-        case 'date':
-          if (typeof value === 'string' || typeof value === 'number') {
-            value = new Date(value);
-          }
-          break;
-        case 'formula':
-          // Keep as string for formulas
-          break;
-        default:
-          // text type, keep as string
-          break;
-      }
-      
-      return {
-        type: element.type as 'text' | 'number' | 'boolean' | 'date' | 'formula',
-        value,
-        width: element.props.width,
-        format: element.props.z
-      };
-    }
-    
-    return null;
-  }
-  
+
+
   // Process all children as rows
   if (rootElement.children) {
     for (const child of rootElement.children) {
-      const row = processElement(child);
+      if (child.nodeType !== 'element') {
+        throw new Error(`Non-element node with value ${child.value} found in top level`)
+      }
+
+      const row = processTopLevelElements(child);
       if (row) {
         sheet.rows.push(row);
       }
     }
   }
-  
+
   return sheet;
-} 
+}

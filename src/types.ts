@@ -18,14 +18,17 @@ export interface RowProps {
 
 export interface SheetJsOutputProps {
   children?: React.ReactNode;
-  render?: (worksheet: WorkSheet) => React.ReactNode;
 }
 
 export interface ExcelCell {
-  type: 'text' | 'number' | 'boolean' | 'date' | 'formula';
-  value: string | number | boolean | Date;
+  t?: string;
+  v?: string | number | boolean;
+  z?: string;
+  f?: string;
+  s?: string;
+
+  // Other non-standard properties
   width?: number;
-  format?: string;
 }
 
 export interface ExcelRow {
@@ -39,10 +42,19 @@ export interface ExcelSheet {
 
 export interface CustomElement {
   type: string;
+  nodeType: 'element';
   props: Record<string, any>;
-  children: CustomElement[];
+  children: CustomNode[];
+  value?: string; // For text elements
 }
 
 export interface SheetJsOutputRef {
   getExcelSheet: () => Promise<ExcelSheet | null>;
-} 
+}
+
+export interface TextNode {
+  value: string;
+  nodeType: 'text';
+}
+
+export type CustomNode = TextNode | CustomElement;

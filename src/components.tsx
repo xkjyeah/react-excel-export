@@ -22,9 +22,6 @@ export const formula: React.FC<CellProps> = ({ children, width, z }) => {
   return React.createElement('formula', { width, z }, children);
 };
 
-export const row: React.FC<{ widthSetting?: boolean; children?: React.ReactNode }> = ({ 
-  children, 
-  widthSetting 
-}) => {
+export const row: React.FC<{ widthSetting?: boolean; children?: React.ReactNode }> = ({ children, widthSetting }) => {
   return React.createElement('row', { widthSetting }, children);
-}; 
+};
