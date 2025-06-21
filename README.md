@@ -87,6 +87,9 @@ const downloadExcel = async sheetJsOutput => {
 };
 ```
 
+Result:
+![Screenshot of Excel sheet generated in Numbers](images/numbers.png)
+
 ## 🚀 Live Demo
 
 Check out the live demo at: https://xkjyeah.github.io/react-export-excel/
