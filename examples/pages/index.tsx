@@ -72,7 +72,7 @@ function HomeComponent() {
       </main>
 
       <footer className={styles.footer}>
-        <a href="https://github.com/yourusername/react-export-excel" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/xkjyeah/react-export-excel" target="_blank" rel="noopener noreferrer">
           View on GitHub
         </a>
       </footer>

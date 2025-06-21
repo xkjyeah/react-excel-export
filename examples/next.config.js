@@ -2,6 +2,8 @@
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
+  basePath: '/react-export-excel',
+  assetPrefix: '/react-export-excel/',
   images: {
     unoptimized: true,
   },

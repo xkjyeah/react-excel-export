@@ -16,48 +16,101 @@ A React component that allows you to define Excel sheets using JSX and export th
 
 ```tsx
 import React, { useRef } from 'react';
-import { SheetJsOutput } from './SheetJsOutput';
-import { SheetJsOutputRef } from './types';
+import { SheetJsOutput, SheetJsOutputRef } from 'react-export-excel';
+import * as XLSX from 'xlsx';
 
 const MyComponent: React.FC = () => {
   const sheetRef = useRef<SheetJsOutputRef>(null);
 
-  const handleGetExcelSheet = () => {
-    if (sheetRef.current) {
-      const excelSheet = sheetRef.current.getExcelSheet();
-      if (excelSheet) {
-        console.log('Excel Sheet:', excelSheet);
-        // Use the Excel sheet data as needed
-        // This is when the actual conversion happens!
-      }
-    }
-  };
-
   return (
     <div>
       <SheetJsOutput ref={sheetRef}>
-        <row>
-          <text>Name</text>
-          <number>Age</number>
-          <boolean>Active</boolean>
+        <row widthSetting={true}>
+          <text width={15}>Name</text>
+          <text width={8}>Age</text>
+          <text width={12}>Salary</text>
+          <text width={8}>Active</text>
+          <text width={12}>Start Date</text>
         </row>
+
         <row>
           <text>John Doe</text>
           <number>30</number>
+          <number z="$#,##0">75000</number>
           <boolean>true</boolean>
+          <date z="MMM dd, yyyy">2020-01-15</date>
         </row>
+
         <row>
           <text>Jane Smith</text>
-          <number>25</number>
+          <number>28</number>
+          <number z="$#,##0">65000</number>
+          <boolean>true</boolean>
+          <date z="MMM dd, yyyy">2019-03-20</date>
+        </row>
+
+        <row>
+          <text>Bob Johnson</text>
+          <number>35</number>
+          <number z="$#,##0">85000</number>
           <boolean>false</boolean>
+          <date z="MMM dd, yyyy">2018-11-10</date>
         </row>
       </SheetJsOutput>
 
-      <button onClick={handleGetExcelSheet}>Generate Excel Sheet Data</button>
+      <button onClick={downloadExcel(sheetRef.current)}>Download as Excel</button>
     </div>
   );
 };
+
+const downloadExcel = async sheetJsOutput => {
+  const worksheet = await sheetJsOutput.getExcelSheet();
+  const workbook = {
+    SheetNames: ['Sheet1'],
+    Sheets: { Sheet1: worksheet },
+  };
+
+  const fileData = XLSX.writeXLSX(workbook, {
+    bookType: 'xlsx',
+    type: 'buffer',
+  });
+
+  const blob = new Blob([fileData], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'employee-data.xlsx';
+  a.click();
+};
 ```
+
+## 🚀 Live Demo
+
+Check out the live demo at: https://xkjyeah.github.io/react-export-excel/
+
+The demo showcases both HTML table and Excel export functionality with syntax-highlighted source code.
+
+## 📁 Examples
+
+This repository includes a complete Next.js example application in the `examples/` directory that demonstrates:
+
+- Basic Excel export functionality
+- HTML table display with export capability
+- Syntax-highlighted source code display
+- Ready-to-deploy GitHub Pages configuration
+
+### Running the Example
+
+```bash
+cd examples
+npm install
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the demo in action.
 
 ### Cell Types
 
