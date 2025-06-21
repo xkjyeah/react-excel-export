@@ -1,5 +1,5 @@
-import { SheetJsOutput } from 'react-export-excel';
-import type { SheetJsOutputRef } from 'react-export-excel';
+import { SheetJsOutput } from 'react-export-sheetjs';
+import type { SheetJsOutputRef } from 'react-export-sheetjs';
 import { useRef } from 'react';
 // source-hide-next-line
 import styles from './styles/Home.module.css';

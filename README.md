@@ -16,7 +16,7 @@ A React component that allows you to define Excel sheets using JSX and export th
 
 ```tsx
 import React, { useRef } from 'react';
-import { SheetJsOutput, SheetJsOutputRef } from 'react-export-excel';
+import { SheetJsOutput, SheetJsOutputRef } from 'react-export-sheetjs';
 import * as XLSX from 'xlsx';
 
 const MyComponent: React.FC = () => {
