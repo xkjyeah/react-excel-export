@@ -92,6 +92,5 @@ export const SheetJsOutput = forwardRef<SheetJsOutputRef, SheetJsOutputProps>(({
     const colLetter = String.fromCharCode(65 + col);
     return colLetter + (row + 1);
   };
-
-  return <>Your text will appear here</>;
+  return null;
 });

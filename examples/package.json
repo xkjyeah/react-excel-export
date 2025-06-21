@@ -10,7 +10,9 @@
     "export": "next build && next export"
   },
   "dependencies": {
+    "@types/prismjs": "^1.26.5",
     "next": "14.0.0",
+    "prismjs": "^1.30.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-export-excel": "file:..",

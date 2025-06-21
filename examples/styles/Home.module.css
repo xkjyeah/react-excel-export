@@ -143,19 +143,19 @@
     width: 100%;
     flex-direction: column;
   }
-  
+
   .title {
     font-size: 2.5rem;
   }
-  
+
   .description {
     font-size: 1.2rem;
   }
-  
+
   .demoSection,
   .previewSection,
   .codeSection,
   .featuresSection {
     padding: 1rem;
   }
-} 
+}

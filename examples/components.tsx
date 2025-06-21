@@ -1,9 +1,10 @@
 import { SheetJsOutput } from 'react-export-excel';
 import type { SheetJsOutputRef } from 'react-export-excel';
-import { forwardRef } from 'react';
+import { useRef } from 'react';
+// source-hide-next-line
 import styles from './styles/Home.module.css';
+import * as XLSX from 'xlsx';
 
-// Sample data
 const sampleData = [
   { name: 'John Doe', age: 30, salary: 75000, active: true, startDate: '2020-01-15' },
   { name: 'Jane Smith', age: 28, salary: 65000, active: true, startDate: '2019-03-20' },
@@ -11,29 +12,35 @@ const sampleData = [
   { name: 'Alice Brown', age: 26, salary: 60000, active: true, startDate: '2021-06-05' },
 ];
 
-export const ExcelTable = forwardRef<SheetJsOutputRef, {}>((props, ref) => {
+export const ExcelTable = () => {
+  const ref = useRef<SheetJsOutputRef>(null);
   return (
-    <SheetJsOutput ref={ref}>
-      <row widthSetting={true}>
-        <text width={15}>Name</text>
-        <text width={8}>Age</text>
-        <text width={12}>Salary</text>
-        <text width={8}>Active</text>
-        <text width={12}>Start Date</text>
-      </row>
-
-      {sampleData.map((employee, index) => (
-        <row key={index}>
-          <text>{employee.name}</text>
-          <number>{employee.age}</number>
-          <number z="$#,##0">{employee.salary}</number>
-          <boolean>{employee.active}</boolean>
-          <date z="MMM DD, YYYY">{employee.startDate}</date>
+    <>
+      <SheetJsOutput ref={ref}>
+        <row widthSetting={true}>
+          <text width={15}>Name</text>
+          <text width={8}>Age</text>
+          <text width={12}>Salary</text>
+          <text width={8}>Active</text>
+          <text width={12}>Start Date</text>
         </row>
-      ))}
-    </SheetJsOutput>
+
+        {sampleData.map((employee, index) => (
+          <row key={index}>
+            <text>{employee.name}</text>
+            <number>{employee.age}</number>
+            <number z="$#,##0">{employee.salary}</number>
+            <boolean>{employee.active}</boolean>
+            <date z="MMM dd, yyyy">{employee.startDate}</date>
+          </row>
+        ))}
+      </SheetJsOutput>
+      <button className={styles.exportButton} onClick={() => downloadSheet(ref.current)}>
+        Download as Excel
+      </button>
+    </>
   );
-});
+};
 
 export function HTMLTable() {
   return (
@@ -60,4 +67,32 @@ export function HTMLTable() {
       </tbody>
     </table>
   );
+}
+
+function downloadBlobAsMimeType(blob: Blob, mimeType: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sheet.xlsx';
+  a.click();
+}
+
+async function downloadSheet(ref: SheetJsOutputRef) {
+  const worksheet = await ref.getExcelSheet();
+  const workbook = {
+    SheetNames: ['Sheet1'],
+    Sheets: {
+      Sheet1: worksheet,
+    },
+  };
+  const fileData = XLSX.writeXLSX(workbook, {
+    bookType: 'xlsx',
+    type: 'buffer',
+  });
+
+  const blob = new Blob([fileData], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  downloadBlobAsMimeType(blob, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 }
