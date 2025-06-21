@@ -65,10 +65,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xkjyeah/react-export-excel.git"
+    "url": "https://github.com/xkjyeah/react-excel-export.git"
   },
   "bugs": {
-    "url": "https://github.com/xkjyeah/react-export-excel/issues"
+    "url": "https://github.com/xkjyeah/react-excel-export/issues"
   },
-  "homepage": "https://github.com/xkjyeah/react-export-excel#readme"
+  "homepage": "https://github.com/xkjyeah/react-excel-export#readme"
 }
