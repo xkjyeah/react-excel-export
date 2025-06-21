@@ -40,6 +40,11 @@ export interface ExcelSheet {
   rows: ExcelRow[];
 }
 
+export interface CustomRoot {
+  nodeType: 'root';
+  children: CustomNode[];
+}
+
 export interface CustomElement {
   type: string;
   nodeType: 'element';

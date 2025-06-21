@@ -1,5 +1,5 @@
-import Reconciler, { DefaultEventPriority } from 'react-reconciler';
-import { ExcelCell, ExcelRow, ExcelSheet, CustomElement, TextNode, CustomNode } from './types';
+import Reconciler from 'react-reconciler';
+import { ExcelCell, ExcelRow, ExcelSheet, CustomElement, TextNode, CustomNode, CustomRoot } from './types';
 
 // Custom host config for Excel rendering
 const hostConfig = {
@@ -164,7 +164,7 @@ const hostConfig = {
   supportsPersistence: true,
 
   getCurrentEventPriority() {
-    return DefaultEventPriority;
+    return 0;
   },
 
   // Undocumented methods as of June 21, 2025
@@ -189,7 +189,7 @@ const hostConfig = {
 };
 
 // Create the reconciler
-export const excelReconciler = Reconciler(hostConfig);
+export const excelReconciler = Reconciler(hostConfig as any);
 
 function processCell(element: CustomElement): ExcelCell | null {
   return {
@@ -264,7 +264,7 @@ function processTopLevelElements(element: CustomElement): ExcelRow | null {
   return null;
 }
 // Helper function to convert custom elements to Excel sheet
-export function convertToExcelSheet(rootElement: CustomElement): ExcelSheet {
+export function convertToExcelSheet(rootElement: CustomRoot): ExcelSheet {
   const sheet: ExcelSheet = { rows: [] };
 
   // Process all children as rows

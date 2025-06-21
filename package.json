@@ -30,7 +30,8 @@
   "license": "MIT",
   "peerDependencies": {
     "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "react-dom": ">=16.8.0",
+    "@types/react-reconciler": "^0.32.0"
   },
   "dependencies": {
     "xlsx": "^0.18.5"

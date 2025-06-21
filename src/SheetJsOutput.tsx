@@ -1,15 +1,29 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { excelReconciler, convertToExcelSheet } from './renderer';
-import { SheetJsOutputProps, ExcelSheet, SheetJsOutputRef } from './types';
+import { SheetJsOutputProps, ExcelSheet, SheetJsOutputRef, CustomRoot } from './types';
+
+if (typeof window !== 'undefined') {
+  (window as any).ReactC = React;
+}
 
 export const SheetJsOutput = forwardRef<SheetJsOutputRef, SheetJsOutputProps>(({ children }, ref) => {
   useImperativeHandle(
     ref,
     () => ({
       getExcelSheet: async () => {
-        const container = { type: 'root', props: {}, children: [] };
-        debugger;
-        const root = excelReconciler.createContainer(container, false, false);
+        const container: CustomRoot = { nodeType: 'root', children: [] };
+        const root = excelReconciler.createContainer(
+          container,
+          0,
+          null,
+          false,
+          null,
+          '',
+          e => {
+            console.error(e);
+          },
+          null
+        );
 
         return new Promise(resolve => {
           console.log('getExcelSheet -- updateContainer -- start');
