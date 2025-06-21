@@ -243,47 +243,6 @@ Downloads the generated worksheet as an Excel file.
 - `worksheet` - The worksheet object from SheetJsOutput
 - `filename` - Optional filename (default: 'export.xlsx')
 
-## Advanced Examples
-
-### With Custom Styling
-
-```jsx
-<SheetJsOutput
-  render={worksheet => (
-    <div>
-      <button
-        onClick={() => downloadExcel(worksheet, 'styled-export.xlsx')}
-        style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white' }}
-      >
-        Download Styled Excel
-      </button>
-    </div>
-  )}
->
-  {/* Your Excel structure */}
-</SheetJsOutput>
-```
-
-### With Conditional Rendering
-
-```jsx
-<SheetJsOutput render={worksheet => <button onClick={() => downloadExcel(worksheet)}>Export Data</button>}>
-  <row>
-    <text>Name</text>
-    <text>Status</text>
-    <text>Value</text>
-  </row>
-
-  {data.map((item, index) => (
-    <row key={index}>
-      <text>{item.name}</text>
-      <text>{item.status}</text>
-      <number z="#,##0.00">{item.status === 'active' ? item.value : 0}</number>
-    </row>
-  ))}
-</SheetJsOutput>
-```
-
 ## How It Works
 
 This library uses React's custom renderer (react-reconciler) to create a virtual representation of Excel data. Instead of rendering to the DOM, it renders to a custom data structure that can be converted to SheetJS format.
