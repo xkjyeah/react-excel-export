@@ -198,11 +198,14 @@ const hostConfig = {
 // Create the reconciler
 export const excelReconciler = Reconciler(hostConfig as any);
 
+function dropUndefinedValues(obj: any) {
+  return Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== undefined));
+}
+
 function processCell(element: CustomElement): ExcelCell | null {
   return {
     ...processCellContents(element),
-    width: element.props.width,
-    z: element.props.z,
+    ...dropUndefinedValues({ width: element.props.width, z: element.props.z }),
   };
 }
 
@@ -250,9 +253,9 @@ function processCellContents(element: CustomElement): ExcelCell {
     }
   } else if (element.nodeType === 'element' && element.type === 'date') {
     return {
-      t: 'd',
-      // TODO convert from epoch to UTC
-      v: new Date(textContent).getTime(),
+      t: 'n',
+      v: convertToExcelDate(new Date(textContent)),
+      z: 'YYYY-MM-DD',
     };
   } else if (element.nodeType === 'element' && element.type === 'formula') {
     return {
@@ -310,4 +313,18 @@ export function convertToExcelSheet(rootElement: CustomRoot): ExcelSheet {
   }
 
   return sheet;
+}
+
+// Helper function to deal with dates
+function convertToExcelDate(date: Date): number {
+  if (isNaN(date.getTime())) {
+    throw new Error(`Invalid date ${date}`);
+  }
+
+  const basedate = new Date('1899-12-31T00:00:00Z');
+
+  const adjustmentBasedate = new Date('1900-03-01T00:00:00Z');
+  const adjustmentFor1900LeapYearBug = date.getTime() > adjustmentBasedate.getTime() ? 86400e3 : 0;
+
+  return (date.getTime() - basedate.getTime() + adjustmentFor1900LeapYearBug) / 86400e3;
 }

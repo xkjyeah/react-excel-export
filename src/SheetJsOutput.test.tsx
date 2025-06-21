@@ -103,6 +103,24 @@ describe('SheetJsOutput', () => {
     });
   });
 
+  it('should render dates', async () => {
+    const ref = React.createRef<any>();
+    render(
+      <SheetJsOutput ref={ref}>
+        <row>
+          <date>2021-01-01</date>
+          <date>2022-01-02</date>
+        </row>
+      </SheetJsOutput>
+    );
+
+    expect(await ref.current!.getExcelSheet()).toEqual({
+      '!ref': 'A1:B1',
+      A1: { v: 44197, t: 'n', z: 'YYYY-MM-DD' },
+      B1: { v: 44563, t: 'n', z: 'YYYY-MM-DD' },
+    });
+  });
+
   it('should handle cells with format', async () => {
     const ref = React.createRef<any>();
     render(
