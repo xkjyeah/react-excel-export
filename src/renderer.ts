@@ -191,45 +191,47 @@ const hostConfig = {
 // Create the reconciler
 export const excelReconciler = Reconciler(hostConfig);
 
-
 function processCell(element: CustomElement): ExcelCell | null {
   return {
     ...processCellContents(element),
     width: element.props.width,
     z: element.props.z,
-  }
+  };
 }
 
-function processCellContents(element: CustomElement): ExcelCell  {
-  const textContent = element.children?.filter(child => child.nodeType === 'text')?.map(child => child.value).join('')
+function processCellContents(element: CustomElement): ExcelCell {
+  const textContent = element.children
+    ?.filter(child => child.nodeType === 'text')
+    ?.map(child => child.value)
+    .join('');
 
   if (element.nodeType === 'element' && element.type === 'text') {
     return {
       t: 's',
       v: textContent,
-    }
+    };
   } else if (element.nodeType === 'element' && element.type === 'number') {
     return {
       t: 'n',
       v: Number(textContent),
-    }
+    };
   } else if (element.nodeType === 'element' && element.type === 'boolean') {
     return {
       t: 'b',
       v: textContent === 'true' || textContent === '1',
-    }
+    };
   } else if (element.nodeType === 'element' && element.type === 'date') {
     return {
       t: 'd',
       // TODO convert from epoch to UTC
       v: new Date(textContent).getTime(),
-    }
+    };
   } else if (element.nodeType === 'element' && element.type === 'formula') {
     return {
       f: textContent,
-    }
+    };
   } else {
-    throw new Error('Unsupported cell type')
+    throw new Error('Unsupported cell type');
   }
 }
 
@@ -244,9 +246,9 @@ function processTopLevelElements(element: CustomElement): ExcelRow | null {
       for (const child of element.children) {
         if (child.nodeType === 'text') {
           if (child.value.trim()) {
-            throw new Error('Non-empty text node found in row')
+            throw new Error('Non-empty text node found in row');
           }
-          continue
+          continue;
         }
 
         const cell = processCell(child);
@@ -265,12 +267,11 @@ function processTopLevelElements(element: CustomElement): ExcelRow | null {
 export function convertToExcelSheet(rootElement: CustomElement): ExcelSheet {
   const sheet: ExcelSheet = { rows: [] };
 
-
   // Process all children as rows
   if (rootElement.children) {
     for (const child of rootElement.children) {
       if (child.nodeType !== 'element') {
-        throw new Error(`Non-element node with value ${child.value} found in top level`)
+        throw new Error(`Non-element node with value ${child.value} found in top level`);
       }
 
       const row = processTopLevelElements(child);
