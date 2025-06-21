@@ -1,10 +1,9 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { excelReconciler, convertToExcelSheet } from './renderer';
 import { SheetJsOutputProps, ExcelSheet, SheetJsOutputRef, CustomRoot } from './types';
+import { ErrorBoundary } from 'react-error-boundary';
 
-if (typeof window !== 'undefined') {
-  (window as any).ReactC = React;
-}
+export type { SheetJsOutputRef } from './types';
 
 export const SheetJsOutput = forwardRef<SheetJsOutputRef, SheetJsOutputProps>(({ children }, ref) => {
   useImperativeHandle(
@@ -20,18 +19,30 @@ export const SheetJsOutput = forwardRef<SheetJsOutputRef, SheetJsOutputProps>(({
           null,
           '',
           e => {
-            console.error(e);
+            console.error('ERROR OCCURRED', e);
           },
           null
         );
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
           console.log('getExcelSheet -- updateContainer -- start');
 
-          excelReconciler.updateContainer(children, root, null, () => {
-            console.log('getExcelSheet -- updateContainer -- callback');
-            resolve(convertToSheetJSFormat(convertToExcelSheet(container)));
-          });
+          excelReconciler.updateContainer(
+            <ErrorBoundary
+              fallbackRender={({ error }) => {
+                reject(error);
+                throw error;
+              }}
+            >
+              {children}
+            </ErrorBoundary>,
+            root,
+            null,
+            () => {
+              console.log('getExcelSheet -- updateContainer -- callback');
+              resolve(convertToSheetJSFormat(convertToExcelSheet(container)));
+            }
+          );
         });
       },
     }),

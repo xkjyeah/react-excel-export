@@ -83,17 +83,23 @@ describe('SheetJsOutput', () => {
           <boolean>something</boolean>
           <boolean></boolean>
         </row>
+        <row>
+          <boolean>{true}</boolean>
+          <boolean>{false}</boolean>
+        </row>
       </SheetJsOutput>
     );
 
     expect(await ref.current!.getExcelSheet()).toEqual({
-      '!ref': 'A1:B3',
+      '!ref': 'A1:B4',
       A1: { v: true, t: 'b' },
       B1: { v: false, t: 'b' },
       A2: { v: true, t: 'b' },
       B2: { v: false, t: 'b' },
       A3: { v: false, t: 'b' },
       B3: { v: false, t: 'b' },
+      A4: { v: true, t: 'b' },
+      B4: { v: false, t: 'b' },
     });
   });
 

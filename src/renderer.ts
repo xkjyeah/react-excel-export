@@ -1,46 +1,52 @@
 import Reconciler from 'react-reconciler';
 import { ExcelCell, ExcelRow, ExcelSheet, CustomElement, TextNode, CustomNode, CustomRoot } from './types';
 
+function traceCustomRenderer(method: string, ...args: any[]) {
+  if (['createTextInstance', 'appendInitialChild'].includes(method)) {
+    console.log(`[CustomRenderer] ${method}`, ...args);
+  }
+}
+
 // Custom host config for Excel rendering
 const hostConfig = {
   // Create a new instance
   createInstance(type: string, props: any, rootContainerInstance: ExcelSheet): CustomElement {
-    console.log('createInstance', type, props, rootContainerInstance);
+    traceCustomRenderer('createInstance', type, props, rootContainerInstance);
     return { type, props, children: [], nodeType: 'element' };
   },
 
   // Create a new text instance
   createTextInstance(text: string, rootContainerInstance: ExcelSheet): TextNode {
-    console.log('createTextInstance', text, rootContainerInstance);
+    traceCustomRenderer('createTextInstance', text, rootContainerInstance);
     return { value: text, nodeType: 'text' };
   },
 
   // // Append a child to a parent
   // appendChild(parentInstance: CustomElement, child: CustomNode) {
-  //   console.log('appendChild', parentInstance, child)
+  //   traceCustomRenderer('appendChild', parentInstance, child)
   //   if (parentInstance.children) {
   //     parentInstance.children.push(child);
   //   }
   // },
 
   appendInitialChild(parentInstance: CustomElement, child: CustomNode) {
-    console.log('appendInitialChild', parentInstance, child);
+    traceCustomRenderer('appendInitialChild', parentInstance, child);
     parentInstance.children?.push(child);
   },
 
   finalizeInitialChildren(instance: CustomNode, type: string, props: any) {
-    console.log('finalizeInitialChildren', instance, type, props);
+    traceCustomRenderer('finalizeInitialChildren', instance, type, props);
     return false;
   },
 
   shouldSetTextContent(instance: CustomNode, type: string, props: any) {
-    console.log('shouldSetTextContent', instance, type, props);
+    traceCustomRenderer('shouldSetTextContent', instance, type, props);
     return false;
   },
 
   // // Append a child to a parent before a specific child
   // insertBefore(parentInstance: CustomElement, child: CustomNode, beforeChild: CustomNode) {
-  //   console.log('insertBefore', parentInstance, child, beforeChild)
+  //   traceCustomRenderer('insertBefore', parentInstance, child, beforeChild)
   //   if (parentInstance.children) {
   //     const index = parentInstance.children.indexOf(beforeChild);
   //     if (index !== -1) {
@@ -53,7 +59,7 @@ const hostConfig = {
 
   // // Remove a child from a parent
   // removeChild(parentInstance: CustomElement, child: CustomNode) {
-  //   console.log('removeChild', parentInstance, child)
+  //   traceCustomRenderer('removeChild', parentInstance, child)
   //   if (parentInstance.children) {
   //     const index = parentInstance.children.indexOf(child);
   //     if (index !== -1) {
@@ -63,7 +69,7 @@ const hostConfig = {
   // },
 
   preparePortalMount(parentInstance: CustomElement, child: CustomNode) {
-    console.log('preparePortalMount', parentInstance, child);
+    traceCustomRenderer('preparePortalMount', parentInstance, child);
   },
 
   // Get the root container instance
@@ -114,6 +120,7 @@ const hostConfig = {
 
   // Reset text content
   resetTextContent(instance: any) {
+    console.log('resetTextContent', instance);
     // No reset needed
   },
 
@@ -169,17 +176,17 @@ const hostConfig = {
 
   // Undocumented methods as of June 21, 2025
   createContainerChildSet(container: CustomElement) {
-    console.log('createContainerChildSet', arguments);
+    traceCustomRenderer('createContainerChildSet', arguments);
     return container;
   },
 
   replaceContainerChildren(c1: CustomElement, c2: CustomElement) {
-    console.log('replaceContainerChildren', arguments);
+    traceCustomRenderer('replaceContainerChildren', arguments);
     return c2;
   },
 
   appendChildToContainerChildSet(container: CustomElement, child: CustomNode) {
-    console.log('appendChildToContainerChildSet', arguments);
+    traceCustomRenderer('appendChildToContainerChildSet', arguments);
     container.children?.push(child);
   },
 
@@ -200,10 +207,18 @@ function processCell(element: CustomElement): ExcelCell | null {
 }
 
 function processCellContents(element: CustomElement): ExcelCell {
-  const textContent = element.children
+  let textContent = element.children
     ?.filter(child => child.nodeType === 'text')
     ?.map(child => child.value)
     .join('');
+
+  // Special case for booleans -- if the children is a boolean,
+  // it doesn't appear as children, but as a prop
+  if (element.type === 'boolean' && typeof element.props.children === 'boolean') {
+    textContent = element.props.children.toString();
+  }
+
+  console.log('Rendering cell', element.type, textContent, element.children);
 
   if (element.nodeType === 'element' && element.type === 'text') {
     return {
@@ -216,10 +231,23 @@ function processCellContents(element: CustomElement): ExcelCell {
       v: Number(textContent),
     };
   } else if (element.nodeType === 'element' && element.type === 'boolean') {
-    return {
-      t: 'b',
-      v: textContent === 'true' || textContent === '1',
-    };
+    if (textContent === 'true' || textContent === '1') {
+      return {
+        t: 'b',
+        v: true,
+      };
+    } else if (textContent === 'false' || textContent === '0') {
+      return {
+        t: 'b',
+        v: false,
+      };
+    } else {
+      console.warn(`Invalid boolean value ${textContent}`);
+      return {
+        t: 'b',
+        v: false,
+      };
+    }
   } else if (element.nodeType === 'element' && element.type === 'date') {
     return {
       t: 'd',
