@@ -21,6 +21,7 @@ export const ExcelTable = () => {
           <text width={15}>Name</text>
           <text width={8}>Age</text>
           <text width={12}>Salary</text>
+          <text width={12}>Monthly salary</text>
           <text width={8}>Active</text>
           <text width={12}>Start Date</text>
         </row>
@@ -30,6 +31,7 @@ export const ExcelTable = () => {
             <text>{employee.name}</text>
             <number>{employee.age}</number>
             <number z="$#,##0">{employee.salary}</number>
+            <formula z="$#,##0">{rc(0, -1)} / 12</formula>
             <boolean>{employee.active}</boolean>
             <date z="MMM dd, yyyy">{employee.startDate}</date>
           </row>
@@ -37,38 +39,6 @@ export const ExcelTable = () => {
       </SheetJsOutput>
       <button className={styles.exportButton} onClick={() => downloadSheet(ref.current)}>
         Download as Excel
-      </button>
-    </>
-  );
-};
-
-export const FormulaExampleTable = () => {
-  const ref = useRef<SheetJsOutputRef>(null);
-  return (
-    <>
-      <SheetJsOutput ref={ref}>
-        <row>
-          <text>Value 1</text>
-          <text>Value 2</text>
-          <text>Sum</text>
-        </row>
-        <row>
-          <number>10</number>
-          <number>20</number>
-          <formula>
-            ={rc(0, -1)} + {rc(0, -2)}
-          </formula>
-        </row>
-        <row>
-          <number>5</number>
-          <number>15</number>
-          <formula>
-            ={rc(0, -1)} + {rc(0, -2)}
-          </formula>
-        </row>
-      </SheetJsOutput>
-      <button className={styles.exportButton} onClick={() => downloadSheet(ref.current)}>
-        Download Formula Example
       </button>
     </>
   );
@@ -92,6 +62,7 @@ export function HTMLTable() {
             <td>{employee.name}</td>
             <td>{employee.age}</td>
             <td>${employee.salary.toLocaleString()}</td>
+            <td>${(employee.salary / 12).toLocaleString()}</td>
             <td>{employee.active ? 'Yes' : 'No'}</td>
             <td>{new Date(employee.startDate).toLocaleDateString()}</td>
           </tr>
