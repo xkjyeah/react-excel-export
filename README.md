@@ -4,12 +4,11 @@ A React component that allows you to define Excel sheets using JSX and export th
 
 ## Features
 
-- Define Excel sheets using familiar JSX syntax
+- Define spreadsheets using familiar JSX syntax
 - Support for different cell types (text, number, boolean, date, formula)
-- **Formula support with relative cell references** using the `rc()` function
+- Formula support with relative cell references using the `rc()` function
 - Custom formatting and column widths
-- **Lazy generation**: Excel sheet data is only generated when requested via ref
-- Convert to SheetJS format for export
+- Convert to SheetJS format for export into any format supported by SheetJS (including Excel)
 
 ## Usage
 
