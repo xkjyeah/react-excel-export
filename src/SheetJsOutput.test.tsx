@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { SheetJsOutput } from './SheetJsOutput';
+import { SheetJsOutput, rc } from './SheetJsOutput';
 import { SheetJsOutputRef } from './types';
 
 describe('SheetJsOutput', () => {
@@ -205,16 +205,24 @@ describe('SheetJsOutput', () => {
         <row>
           <formula z="$#,##0.00">A1+B1</formula>
         </row>
+        <row>
+          <formula z="$#,##0">
+            {rc(-3, 0)} + {rc(-2, 0)} + {rc(0, 1)}
+          </formula>
+          <number>3</number>
+        </row>
       </SheetJsOutput>
     );
 
     const result = await ref.current.getExcelSheet();
 
     expect(result).toEqual({
-      '!ref': 'A1:A3',
+      '!ref': 'A1:B4',
       A1: { v: -4, t: 'n' },
       A2: { v: 5, t: 'n' },
       A3: { f: 'A1+B1', z: '$#,##0.00' },
+      A4: { f: 'A1 + A2 + B4', z: '$#,##0' },
+      B4: { v: 3, t: 'n' },
     });
   });
 });

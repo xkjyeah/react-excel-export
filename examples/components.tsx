@@ -1,4 +1,4 @@
-import { SheetJsOutput } from 'react-export-sheetjs';
+import { SheetJsOutput, rc } from 'react-export-sheetjs';
 import type { SheetJsOutputRef } from 'react-export-sheetjs';
 import { useRef } from 'react';
 // source-hide-next-line
@@ -37,6 +37,38 @@ export const ExcelTable = () => {
       </SheetJsOutput>
       <button className={styles.exportButton} onClick={() => downloadSheet(ref.current)}>
         Download as Excel
+      </button>
+    </>
+  );
+};
+
+export const FormulaExampleTable = () => {
+  const ref = useRef<SheetJsOutputRef>(null);
+  return (
+    <>
+      <SheetJsOutput ref={ref}>
+        <row>
+          <text>Value 1</text>
+          <text>Value 2</text>
+          <text>Sum</text>
+        </row>
+        <row>
+          <number>10</number>
+          <number>20</number>
+          <formula>
+            ={rc(0, -1)} + {rc(0, -2)}
+          </formula>
+        </row>
+        <row>
+          <number>5</number>
+          <number>15</number>
+          <formula>
+            ={rc(0, -1)} + {rc(0, -2)}
+          </formula>
+        </row>
+      </SheetJsOutput>
+      <button className={styles.exportButton} onClick={() => downloadSheet(ref.current)}>
+        Download Formula Example
       </button>
     </>
   );

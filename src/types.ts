@@ -16,6 +16,11 @@ export interface RowProps {
   children?: React.ReactNode;
 }
 
+export interface RCProps {
+  dr: number; // delta row
+  dc: number; // delta column
+}
+
 export interface SheetJsOutputProps {
   children?: React.ReactNode;
 }

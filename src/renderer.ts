@@ -1,5 +1,12 @@
 import Reconciler from 'react-reconciler';
 import { ExcelCell, ExcelRow, ExcelSheet, CustomElement, TextNode, CustomNode, CustomRoot } from './types';
+import * as xlsx from 'xlsx';
+
+// Context for tracking current position during rendering
+interface RenderContext {
+  currentRow: number;
+  currentCol: number;
+}
 
 function traceCustomRenderer(method: string, ...args: any[]) {
   if (['createTextInstance', 'appendInitialChild'].includes(method)) {
@@ -202,14 +209,14 @@ function dropUndefinedValues(obj: any) {
   return Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== undefined));
 }
 
-function processCell(element: CustomElement): ExcelCell | null {
+function processCell(element: CustomElement, context: RenderContext): ExcelCell {
   return {
-    ...processCellContents(element),
+    ...processCellContents(element, context),
     ...dropUndefinedValues({ width: element.props.width, z: element.props.z }),
   };
 }
 
-function processCellContents(element: CustomElement): ExcelCell {
+function processCellContents(element: CustomElement, context?: RenderContext): ExcelCell {
   let textContent = element.children
     ?.filter(child => child.nodeType === 'text')
     ?.map(child => child.value)
@@ -258,15 +265,39 @@ function processCellContents(element: CustomElement): ExcelCell {
       z: 'YYYY-MM-DD',
     };
   } else if (element.nodeType === 'element' && element.type === 'formula') {
+    // Process formula content and resolve RC components
+    const processedFormula = processFormulaWithRC(element, context!);
     return {
-      f: textContent,
+      f: processedFormula,
     };
   } else {
     throw new Error('Unsupported cell type');
   }
 }
 
-function processTopLevelElements(element: CustomElement): ExcelRow | null {
+function processFormulaWithRC(formulaElement: CustomElement, context: RenderContext): string {
+  let formula = '';
+
+  for (const child of formulaElement.children || []) {
+    if (child.nodeType === 'text') {
+      formula += child.value;
+    } else if (child.nodeType === 'element' && child.type === 'RC') {
+      // Convert RC component to actual cell reference
+      const dr = child.props.dr || 0;
+      const dc = child.props.dc || 0;
+      const targetRow = context.currentRow + dr;
+      const targetCol = context.currentCol + dc;
+
+      // Convert to Excel cell reference (e.g., A1, B2, etc.)
+      const cellRef = xlsx.utils.encode_cell({ r: targetRow, c: targetCol });
+      formula += cellRef;
+    }
+  }
+
+  return formula;
+}
+
+function processTopLevelElements(element: CustomElement, rowIndex: number): ExcelRow | null {
   if (element.type === 'row') {
     const row: ExcelRow = {
       cells: [],
@@ -274,6 +305,7 @@ function processTopLevelElements(element: CustomElement): ExcelRow | null {
     };
 
     if (element.children) {
+      let colIndex = 0;
       for (const child of element.children) {
         if (child.nodeType === 'text') {
           if (child.value.trim()) {
@@ -282,30 +314,42 @@ function processTopLevelElements(element: CustomElement): ExcelRow | null {
           continue;
         }
 
-        const cell = processCell(child);
-        if (cell) {
-          row.cells.push(cell);
-        }
+        const context: RenderContext = {
+          currentRow: rowIndex,
+          currentCol: colIndex,
+        };
+
+        const cell = processCell(child, context);
+
+        row.cells.push(cell);
+        colIndex += 1;
       }
     }
 
     return row;
+  } else {
+    throw new Error(`Unsupported top level element ${element.type}`);
   }
-
-  return null;
 }
+
 // Helper function to convert custom elements to Excel sheet
 export function convertToExcelSheet(rootElement: CustomRoot): ExcelSheet {
   const sheet: ExcelSheet = { rows: [] };
 
-  // Process all children as rows
+  // Process all children as rows with position context
   if (rootElement.children) {
+    let rowIndex = 0;
     for (const child of rootElement.children) {
-      if (child.nodeType !== 'element') {
-        throw new Error(`Non-element node with value ${child.value} found in top level`);
+      if (child.nodeType === 'text') {
+        if (child.value.trim()) {
+          throw new Error('Non-empty text node found in row');
+        }
+        continue;
       }
 
-      const row = processTopLevelElements(child);
+      const row = processTopLevelElements(child, rowIndex);
+
+      rowIndex += 1;
       if (row) {
         sheet.rows.push(row);
       }
