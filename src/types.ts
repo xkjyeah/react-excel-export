@@ -59,7 +59,7 @@ export interface CustomElement {
 }
 
 export interface SheetJsOutputRef {
-  getExcelSheet: () => Promise<ExcelSheet | null>;
+  getSheet: () => Promise<ExcelSheet | null>;
 }
 
 export interface TextNode {

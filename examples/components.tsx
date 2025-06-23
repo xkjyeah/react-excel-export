@@ -84,7 +84,7 @@ function downloadBlobAsMimeType(blob: Blob, mimeType: string) {
 }
 
 async function downloadSheet(ref: SheetJsOutputRef) {
-  const worksheet = await ref.getExcelSheet();
+  const worksheet = await ref.getSheet();
   const workbook = {
     SheetNames: ['Sheet1'],
     Sheets: {

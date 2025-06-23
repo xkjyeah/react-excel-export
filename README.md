@@ -78,7 +78,7 @@ const MyComponent: React.FC = () => {
 };
 
 const downloadExcel = async sheetJsOutput => {
-  const worksheet = await sheetJsOutput.getExcelSheet();
+  const worksheet = await sheetJsOutput.getSheet();
   const workbook = {
     SheetNames: ['Sheet1'],
     Sheets: { Sheet1: worksheet },
@@ -144,15 +144,11 @@ Rows support the following properties:
 
 ### Using the Ref
 
-The `SheetJsOutput` component exposes a ref with a `getExcelSheet()` function that returns the current Excel sheet data:
+The `SheetJsOutput` component exposes a ref with a `getSheet()` function that returns the current sheet data as a [SheetJS Sheet Object](https://docs.sheetjs.com/docs/csf/sheet):
 
 ```tsx
-const excelSheet = sheetRef.current.getExcelSheet();
+const excelSheet = await sheetRef.current.getSheet();
 ```
-
-**Important**: The Excel sheet is only generated when this function is called. Before calling it, the function will return `null`.
-
-The returned object is a [SheetJS Sheet Object](https://docs.sheetjs.com/docs/csf/sheet).
 
 ## API Documentation
 
@@ -162,7 +158,6 @@ The main component that renders Excel data.
 
 **Props:**
 
-- `render?: (worksheet: WorkSheet) => React.ReactNode` - Function to render UI with the generated worksheet
 - `children` - Excel structure using the cell components
 
 ### `<row>`
@@ -182,7 +177,7 @@ Renders a text cell.
 
 **Props:**
 
-- `width?: number` - Column width
+- `width?: number` - Column width (only appliable in a `widthSetting` row)
 - `z?: string` - Format string
 - `children` - Cell content
 
@@ -192,7 +187,7 @@ Renders a numeric cell.
 
 **Props:**
 
-- `width?: number` - Column width
+- `width?: number` - Column width (only appliable in a `widthSetting` row)
 - `z?: string` - Format string (e.g., "#,##0.00")
 - `children` - Cell content
 
@@ -202,7 +197,7 @@ Renders a date cell.
 
 **Props:**
 
-- `width?: number` - Column width
+- `width?: number` - Column width (only appliable in a `widthSetting` row)
 - `z?: string` - Date format (e.g., "MMM DD", "YYYY-MM-DD")
 - `children` - Date value
 
@@ -212,7 +207,7 @@ Renders a boolean cell.
 
 **Props:**
 
-- `width?: number` - Column width
+- `width?: number` - Column width (only appliable in a `widthSetting` row)
 - `z?: string` - Format string
 - `children` - Boolean value
 
@@ -222,7 +217,7 @@ Renders a formula cell.
 
 **Props:**
 
-- `width?: number` - Column width
+- `width?: number` - Column width (only appliable in a `widthSetting` row)
 - `z?: string` - Format string
 - `children` - Excel formula
 

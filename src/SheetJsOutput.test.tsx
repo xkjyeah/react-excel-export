@@ -12,7 +12,7 @@ describe('SheetJsOutput', () => {
     const ref = React.createRef<SheetJsOutputRef>();
     render(<SheetJsOutput ref={ref}></SheetJsOutput>);
 
-    expect(await ref.current!.getExcelSheet()).toEqual({ '!ref': 'A1:A1' });
+    expect(await ref.current!.getSheet()).toEqual({ '!ref': 'A1:A1' });
   });
 
   it('should render numbers', async () => {
@@ -32,7 +32,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    expect(await ref.current!.getExcelSheet()).toEqual({
+    expect(await ref.current!.getSheet()).toEqual({
       '!ref': 'A1:C2',
       A1: { v: 123, t: 'n' },
       B1: { v: -1.45, t: 'n' },
@@ -58,7 +58,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    expect(await ref.current!.getExcelSheet()).toEqual({
+    expect(await ref.current!.getSheet()).toEqual({
       '!ref': 'A1:B2',
       A1: { v: 'Hello', t: 's' },
       B1: { v: '1e2', t: 's' },
@@ -90,7 +90,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    expect(await ref.current!.getExcelSheet()).toEqual({
+    expect(await ref.current!.getSheet()).toEqual({
       '!ref': 'A1:B4',
       A1: { v: true, t: 'b' },
       B1: { v: false, t: 'b' },
@@ -121,7 +121,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    expect(await ref.current!.getExcelSheet()).toEqual({
+    expect(await ref.current!.getSheet()).toEqual({
       '!ref': 'A1:D2',
       A1: { v: 44197, t: 'n', z: 'YYYY-MM-DD' },
       B1: { v: 44563, t: 'n', z: 'YYYY-MM-DD' },
@@ -143,7 +143,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    const result = await ref.current.getExcelSheet();
+    const result = await ref.current.getSheet();
 
     expect(result['A1']).toEqual({
       v: 123.45,
@@ -163,7 +163,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    const result = await ref.current.getExcelSheet();
+    const result = await ref.current.getSheet();
 
     expect(result).toEqual({
       '!ref': 'A1:B1',
@@ -184,7 +184,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    const result = await ref.current.getExcelSheet();
+    const result = await ref.current.getSheet();
     expect(result).toEqual({
       '!ref': 'A1:B1',
       A1: { v: 'Test', t: 's' },
@@ -214,7 +214,7 @@ describe('SheetJsOutput', () => {
       </SheetJsOutput>
     );
 
-    const result = await ref.current.getExcelSheet();
+    const result = await ref.current.getSheet();
 
     expect(result).toEqual({
       '!ref': 'A1:B4',

@@ -20,7 +20,7 @@ export const SheetJsOutput = forwardRef<SheetJsOutputRef, SheetJsOutputProps>(({
   useImperativeHandle(
     ref,
     () => ({
-      getExcelSheet: async () => {
+      getSheet: async () => {
         const container: CustomRoot = { nodeType: 'root', children: [] };
         const root = excelReconciler.createContainer(
           container,
@@ -36,8 +36,6 @@ export const SheetJsOutput = forwardRef<SheetJsOutputRef, SheetJsOutputProps>(({
         );
 
         return new Promise((resolve, reject) => {
-          console.log('getExcelSheet -- updateContainer -- start');
-
           excelReconciler.updateContainer(
             <ErrorBoundary
               fallbackRender={({ error }) => {
@@ -50,7 +48,6 @@ export const SheetJsOutput = forwardRef<SheetJsOutputRef, SheetJsOutputProps>(({
             root,
             null,
             () => {
-              console.log('getExcelSheet -- updateContainer -- callback');
               resolve(convertToSheetJSFormat(convertToExcelSheet(container)));
             }
           );
