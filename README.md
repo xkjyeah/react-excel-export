@@ -6,6 +6,7 @@ A React component that allows you to define Excel sheets using JSX and export th
 
 - Define Excel sheets using familiar JSX syntax
 - Support for different cell types (text, number, boolean, date, formula)
+- **Formula support with relative cell references** using the `rc()` function
 - Custom formatting and column widths
 - **Lazy generation**: Excel sheet data is only generated when requested via ref
 - Convert to SheetJS format for export
@@ -16,7 +17,7 @@ A React component that allows you to define Excel sheets using JSX and export th
 
 ```tsx
 import React, { useRef } from 'react';
-import { SheetJsOutput, SheetJsOutputRef } from 'react-export-sheetjs';
+import { SheetJsOutput, SheetJsOutputRef, rc } from 'react-export-sheetjs';
 import * as XLSX from 'xlsx';
 
 const MyComponent: React.FC = () => {
@@ -29,6 +30,7 @@ const MyComponent: React.FC = () => {
           <text width={15}>Name</text>
           <text width={8}>Age</text>
           <text width={12}>Salary</text>
+          <text width={12}>Monthly salary</text>
           <text width={8}>Active</text>
           <text width={12}>Start Date</text>
         </row>
@@ -37,6 +39,7 @@ const MyComponent: React.FC = () => {
           <text>John Doe</text>
           <number>30</number>
           <number z="$#,##0">75000</number>
+          <formula z="$#,##0">{rc(0, -1)} / 12</formula>
           <boolean>true</boolean>
           <date z="MMM dd, yyyy">2020-01-15</date>
         </row>
@@ -45,6 +48,7 @@ const MyComponent: React.FC = () => {
           <text>Jane Smith</text>
           <number>28</number>
           <number z="$#,##0">65000</number>
+          <formula z="$#,##0">{rc(0, -1)} / 12</formula>
           <boolean>true</boolean>
           <date z="MMM dd, yyyy">2019-03-20</date>
         </row>
@@ -53,6 +57,7 @@ const MyComponent: React.FC = () => {
           <text>Bob Johnson</text>
           <number>35</number>
           <number z="$#,##0">85000</number>
+          <formula z="$#,##0">{rc(0, -1)} / 12</formula>
           <boolean>false</boolean>
           <date z="MMM dd, yyyy">2018-11-10</date>
         </row>
@@ -234,6 +239,35 @@ Renders a formula cell.
 - `width?: number` - Column width
 - `z?: string` - Format string
 - `children` - Excel formula
+
+### Formula Support
+
+The library supports Excel formulas with relative cell references using the `rc()` function:
+
+```tsx
+import { rc } from 'react-export-sheetjs';
+
+// Formula that divides the cell to the left by 12
+<formula z="$#,##0">{rc(0, -1)} / 12</formula>;
+```
+
+#### `rc(dr, dc)`
+
+Creates a relative cell reference for use in formulas.
+
+**Parameters:**
+
+- `dr: number` - Delta row (row offset relative to current cell)
+- `dc: number` - Delta column (column offset relative to current cell)
+
+**Examples:**
+
+- `rc(0, -1)` - References the cell to the left
+- `rc(-1, 0)` - References the cell above
+- `rc(0, -2)` - References the cell two columns to the left
+- `rc(1, 1)` - References the cell one row down and one column right
+
+The `rc()` function generates the appropriate Excel cell reference (e.g., A1, B2) based on the current cell position during rendering.
 
 ### Utility Functions
 
