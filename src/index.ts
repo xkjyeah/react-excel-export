@@ -1,6 +1,4 @@
-import React from 'react';
-
-export { SheetJsOutput } from './SheetJsOutput';
+export { rc, SheetJsOutput } from './SheetJsOutput';
 export type {
   SheetJsOutputRef,
   SheetJsOutputProps,

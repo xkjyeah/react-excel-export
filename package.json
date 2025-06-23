@@ -17,7 +17,8 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "deploy": "cd examples && npm run deploy"
+    "deploy": "cd examples && npm run deploy",
+    "example": "npm run build && cd examples && npm run dev"
   },
   "keywords": [
     "react",

@@ -52,6 +52,7 @@ export function HTMLTable() {
           <th>Name</th>
           <th>Age</th>
           <th>Salary</th>
+          <th>Monthly salary</th>
           <th>Active</th>
           <th>Start Date</th>
         </tr>
@@ -62,7 +63,9 @@ export function HTMLTable() {
             <td>{employee.name}</td>
             <td>{employee.age}</td>
             <td>${employee.salary.toLocaleString()}</td>
-            <td>${(employee.salary / 12).toLocaleString()}</td>
+            <td>
+              ${(employee.salary / 12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
             <td>{employee.active ? 'Yes' : 'No'}</td>
             <td>{new Date(employee.startDate).toLocaleDateString()}</td>
           </tr>
