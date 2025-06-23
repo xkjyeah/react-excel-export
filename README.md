@@ -1,4 +1,4 @@
-# React Export Excel
+# react-export-sheetjs
 
 A React component that allows you to define Excel sheets using JSX and export them using SheetJS.
 
@@ -11,6 +11,16 @@ A React component that allows you to define Excel sheets using JSX and export th
 - Convert to SheetJS format for export into any format supported by SheetJS (including Excel)
 
 ## Usage
+
+### Installation
+
+```
+npm install react-export-sheetjs
+```
+
+### Demo
+
+https://xkjyeah.github.io/react-excel-export/
 
 ### Basic Example
 
@@ -94,20 +104,9 @@ const downloadExcel = async sheetJsOutput => {
 Result:
 ![Screenshot of Excel sheet generated in Numbers](images/numbers.png)
 
-## 🚀 Live Demo
+## Trying it out
 
-Check out the live demo at: https://xkjyeah.github.io/react-excel-export/
-
-The demo showcases both HTML table and Excel export functionality with syntax-highlighted source code.
-
-## 📁 Examples
-
-This repository includes a complete Next.js example application in the `examples/` directory that demonstrates:
-
-- Basic Excel export functionality
-- HTML table display with export capability
-- Syntax-highlighted source code display
-- Ready-to-deploy GitHub Pages configuration
+The demo website is hosted in `examples/`.
 
 ### Running the Example
 
@@ -154,18 +153,6 @@ const excelSheet = sheetRef.current.getExcelSheet();
 **Important**: The Excel sheet is only generated when this function is called. Before calling it, the function will return `null`.
 
 The returned object is a [SheetJS Sheet Object](https://docs.sheetjs.com/docs/csf/sheet).
-
-## Installation
-
-Make sure you have the required dependencies:
-
-```bash
-npm install react-reconciler
-```
-
-## TypeScript Support
-
-The component includes full TypeScript support with proper type definitions for all JSX elements and the ref interface.
 
 ## API Documentation
 
@@ -267,17 +254,6 @@ Creates a relative cell reference for use in formulas.
 - `rc(1, 1)` - References the cell one row down and one column right
 
 The `rc()` function generates the appropriate Excel cell reference (e.g., A1, B2) based on the current cell position during rendering.
-
-### Utility Functions
-
-#### `downloadExcel(worksheet, filename?)`
-
-Downloads the generated worksheet as an Excel file.
-
-**Parameters:**
-
-- `worksheet` - The worksheet object from SheetJsOutput
-- `filename` - Optional filename (default: 'export.xlsx')
 
 ## How It Works
 
